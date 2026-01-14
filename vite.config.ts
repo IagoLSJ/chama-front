@@ -60,7 +60,7 @@
       // Proxy para evitar problemas de CORS - redireciona /api para o backend
       proxy: {
         '/api': {
-          target: 'http://localhost:8000',
+          target: 'https://chama-back-eoft.onrender.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''), // Remove /api do path
           secure: false,
