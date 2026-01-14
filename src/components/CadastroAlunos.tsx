@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
 
 interface Aluno {
   id: string;
@@ -12,6 +14,8 @@ interface Aluno {
 export default function CadastroAlunos() {
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [alunoToDelete, setAlunoToDelete] = useState<string | null>(null);
   const [editingAluno, setEditingAluno] = useState<Aluno | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
@@ -59,9 +63,16 @@ export default function CadastroAlunos() {
     handleCloseModal();
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Deseja realmente remover este aluno?')) {
-      setAlunos(alunos.filter((a) => a.id !== id));
+  const handleDeleteClick = (id: string) => {
+    setAlunoToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (alunoToDelete) {
+      setAlunos(alunos.filter((a) => a.id !== alunoToDelete));
+      setIsDeleteDialogOpen(false);
+      setAlunoToDelete(null);
     }
   };
 
@@ -128,7 +139,7 @@ export default function CadastroAlunos() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(aluno.id)}
+                        onClick={() => handleDeleteClick(aluno.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -211,7 +222,29 @@ export default function CadastroAlunos() {
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[400px] text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-red-100 rounded-full text-red-600">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+          </div>
+          <DialogTitle className="text-xl">Remover Aluno</DialogTitle>
+          <DialogDescription className="py-4">
+            Tem certeza que deseja remover este aluno? Esta ação não pode ser desfeita.
+          </DialogDescription>
+          <DialogFooter className="flex gap-3">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="flex-1">
+              Não, cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} className="flex-1">
+              Sim, remover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  </div>
   );
 }

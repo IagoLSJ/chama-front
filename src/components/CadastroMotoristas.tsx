@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
 
 interface Motorista {
   id: string;
@@ -13,6 +15,8 @@ interface Motorista {
 export default function CadastroMotoristas() {
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [motoristaToDelete, setMotoristaToDelete] = useState<string | null>(null);
   const [editingMotorista, setEditingMotorista] = useState<Motorista | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
@@ -133,7 +137,7 @@ export default function CadastroMotoristas() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(motorista.id)}
+                        onClick={() => handleDeleteClick(motorista.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -226,7 +230,29 @@ export default function CadastroMotoristas() {
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[400px] text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-red-100 rounded-full text-red-600">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+          </div>
+          <DialogTitle className="text-xl">Remover Motorista</DialogTitle>
+          <DialogDescription className="py-4">
+            Tem certeza que deseja remover este motorista? Esta ação não pode ser desfeita.
+          </DialogDescription>
+          <DialogFooter className="flex gap-3">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="flex-1">
+              Não, cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} className="flex-1">
+              Sim, remover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  </div>
   );
 }

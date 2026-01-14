@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Calendar, Download } from 'lucide-react';
+import { Plus, Trash2, Calendar, Download, AlertTriangle } from 'lucide-react';
 import { usePassageiros } from '../contexts/PassageirosContext';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
+import { Button } from './ui/button';
 
 export default function ListaPassageiros() {
   const { passageiros, addPassageiro, removePassageiro } = usePassageiros();
   const [data, setData] = useState(new Date().toISOString().split('T')[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [passageiroToDelete, setPassageiroToDelete] = useState<string | null>(null);
   const [formData, setFormData] = useState({ nome: '', faculdade: '' });
 
   const handleAddPassageiro = (e: React.FormEvent) => {
@@ -95,7 +99,7 @@ export default function ListaPassageiros() {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleRemovePassageiro(passageiro.id)}
+                  onClick={() => handleRemovePassageiroClick(passageiro.id)}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -156,6 +160,29 @@ export default function ListaPassageiros() {
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[400px] text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-red-100 rounded-full text-red-600">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+          </div>
+          <DialogTitle className="text-xl">Remover Passageiro</DialogTitle>
+          <DialogDescription className="py-4">
+            Tem certeza que deseja remover este passageiro da lista?
+          </DialogDescription>
+          <DialogFooter className="flex gap-3">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} className="flex-1">
+              Não, cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleRemovePassageiro} className="flex-1">
+              Sim, remover
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

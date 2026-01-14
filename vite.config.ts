@@ -51,10 +51,20 @@
     },
     build: {
       target: 'esnext',
-      outDir: 'build',
+      outDir: 'dist',
     },
     server: {
       port: 3000,
       open: true,
+      cors: true, // Habilita CORS no servidor de desenvolvimento do Vite
+      // Proxy para evitar problemas de CORS - redireciona /api para o backend
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ''), // Remove /api do path
+          secure: false,
+        },
+      },
     },
   });
